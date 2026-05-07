@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organise Nathan</title>
+  <style>
+    :root{
+      /* Summer beach palette (Lord Howe / Hawaii vibe) */
+      --bg:#F7FBFA;            /* sea mist */
+      --panel:#FFFFFF;         /* white sand */
+      --soft:#EAF4F2;          /* light aqua */
+      --line:#D6E6E2;          /* soft divider */
+      --text:#1B2E2A;          /* deep ocean */
+      --muted:#5E7F79;         /* seaweed muted */
+      --faint:#8FA9A3;         /* washed out */
+
+      --blue:#2BB7A9;          /* tropical teal */
+      --green:#34C759;         /* palm green */
+      --orange:#FF8C42;        /* sunset coral */
+      --pink:#FF6F91;          /* hibiscus */
+      --purple:#7A7DFF;        /* twilight */
+      --gold:#E6B566;          /* sand gold */
+
+      --danger:#e24b4a;
+      --warning:#ef9f27;
+      --radius:16px;
+      --radius-sm:10px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#EAF7F5,#FDF6EE);color:var(--text);padding:20px;transition:background .25s ease,color .25s ease}
+    body.dark-mode{
+      --bg:#071F25;
+      --panel:#0D2B32;
+      --soft:#143B43;
+      --line:#24545E;
+      --text:#F2FBF8;
+      --muted:#A8CCC5;
+      --faint:#75A39B;
+      --blue:#53D6C9;
+      --green:#72E38D;
+      --orange:#FF9F63;
+      --pink:#FF7FA4;
+      --purple:#9EA2FF;
+      --gold:#F3C978;
+      background:linear-gradient(180deg,#04191F,#10313A);
+    }
+    body.dark-mode .stat{background:#10323A}
+    body.dark-mode .report{background:#09262D;color:#DDF5F0}
+    body.dark-mode .input,body.dark-mode .select,body.dark-mode .textarea{background:#09262D;color:var(--text)}
+    .app{display:flex;height:720px;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--bg);box-shadow:0 20px 60px rgba(0,0,0,.08)}
+    .sidebar{width:220px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px}
+    .logo{padding:12px 8px 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
+    .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#2BB7A9,#7EDDD1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:#fff;font-weight:800}
+    .logo-emoji{display:inline-block;animation:dancePulse 2.4s ease-in-out infinite;transform-origin:center bottom}
+    @keyframes dancePulse{
+      0%{transform:rotate(0deg) translateY(0) scale(1)}
+      20%{transform:rotate(-8deg) translateY(-2px) scale(1.05)}
+      40%{transform:rotate(6deg) translateY(0px) scale(1.03)}
+      60%{transform:rotate(-6deg) translateY(-1px) scale(1.05)}
+      80%{transform:rotate(8deg) translateY(0px) scale(1.03)}
+      100%{transform:rotate(0deg) translateY(0) scale(1)}
+    }
+    .logo-title{font-size:15px;font-weight:700;line-height:1.1}.logo-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .nav-btn{width:100%;display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:12px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:3px;text-align:left;transition:.15s}
+    .nav-btn:hover,.nav-btn.active{background:var(--soft);color:var(--text)}.nav-btn.active{font-weight:700}.nav-icon{width:18px;text-align:center}.dot{width:6px;height:6px;border-radius:50%;background:var(--blue);margin-left:auto}
+    .sidebar-foot{margin-top:auto;padding:12px 8px;border-top:1px solid var(--line);font-size:11px;color:var(--faint);line-height:1.6}
+    .main{flex:1;overflow-y:auto}.page{display:none;padding:24px}.page.active{display:block}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}.title{font-size:24px;font-weight:750;letter-spacing:-.03em}.sub{font-size:13px;color:var(--muted);margin-top:4px}.section-label{font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.focus-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.focus-card.overdue{border-color:#9E252555}.focus-card.today{border-color:#FF9F6355}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.grid2{display:grid;grid-template-columns:1fr 280px;gap:14px}.card,.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}.stat{background:#fbfbf8}.stat-label{font-size:12px;color:var(--muted);margin-bottom:4px}.stat-val{font-size:28px;font-weight:750;letter-spacing:-.04em}.stat-sub{font-size:12px;color:var(--faint);margin-top:2px}
+    .btn{border:1px solid var(--line);background:var(--soft);color:var(--text);border-radius:12px;padding:9px 13px;font-size:13px;font-weight:650;cursor:pointer}.btn:hover{filter:brightness(.98)}.btn-primary{border-color:transparent;background:var(--blue);color:#fff}.btn-ghost{border:none;background:transparent;color:var(--blue);padding:4px 6px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.select,.input,.textarea{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 10px;font-size:13px;color:var(--text);outline:none}.select:focus,.input:focus,.textarea:focus{border-color:var(--blue)}.textarea{min-height:80px;resize:vertical}
+    .pill{display:inline-flex;align-items:center;justify-content:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent;line-height:1;min-height:28px;white-space:nowrap}.pill.high{background:#FFE0D2;color:#A84317}.pill.medium{background:#FFF0C7;color:#9A6A16}.pill.low{background:#DDF8E6;color:#16743B}.pill.done{background:#DDF8E6;color:#16743B}.pill.progress{background:#DDF6F2;color:#167B72}.pill.due{background:#FFF7E8;color:#9A6A16}.pill.overdue{background:#FFE1E1;color:#9E2525}.pill.today{background:#FFE8D8;color:#A84317}
+    .task-row{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}.task-row:last-child{border-bottom:none}.check{width:18px;height:18px;border:1.5px solid var(--line);border-radius:6px;cursor:pointer;flex:0 0 auto;margin-top:1px;display:flex;align-items:center;justify-content:center}.check.done{background:var(--green);border-color:var(--green);color:#fff}.task-title{font-size:13px;line-height:1.4}.task-title.done{text-decoration:line-through;color:var(--faint)}.meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.task-actions{display:flex;align-items:center;gap:4px;margin-left:auto}.icon-btn{border:none;background:transparent;color:var(--faint);font-size:14px;cursor:pointer;padding:4px 6px;border-radius:8px}.icon-btn:hover{background:var(--soft);color:var(--text)}.delete{border:none;background:transparent;color:var(--faint);font-size:18px;cursor:pointer;padding:0 5px}.delete:hover{color:var(--danger)}
+    .progress{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}.bar{height:100%;border-radius:99px;background:var(--blue);transition:.25s}.company-row{display:grid;grid-template-columns:130px 1fr 45px 40px;gap:10px;align-items:center;margin-bottom:10px}.co-name{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.co-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}.empty{text-align:center;color:var(--faint);font-size:13px;padding:36px 16px}.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.month-cell{min-height:108px;border:1px solid var(--line);border-radius:12px;padding:8px;background:rgba(255,255,255,.02)}.month-cell.muted{opacity:.35}.month-date{font-size:11px;font-weight:800;color:var(--faint);margin-bottom:6px}.day{min-height:110px}.day-head{text-align:center;font-size:11px;font-weight:800;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:8px}.post{font-size:11px;border-radius:10px;padding:7px;margin-bottom:6px;line-height:1.3}.report{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.75;background:#f3f3ef;border-radius:14px;padding:16px;white-space:pre-wrap;max-height:430px;overflow:auto;color:#4b514f}.modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);align-items:center;justify-content:center;z-index:20}.modal-wrap.open{display:flex}.modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;width:380px;box-shadow:0 30px 80px rgba(0,0,0,.2)}.modal h3{font-size:17px;margin-bottom:16px}.form-row{margin-bottom:12px}.label{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}.btn-row{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.colour-row{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);overflow:hidden;position:relative}.swatch input{position:absolute;inset:-4px;width:40px;height:40px;border:none;opacity:0;cursor:pointer}.table{width:100%;border-collapse:collapse;font-size:12px}.table th{text-align:left;color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px;border-bottom:1px solid var(--line)}.table td{padding:9px 8px;border-bottom:1px solid var(--line)}
+    .lock-screen{position:fixed;inset:0;z-index:999;background:linear-gradient(180deg,#04191F,#10313A);display:flex;align-items:center;justify-content:center;padding:20px}
+    .lock-screen.unlocked{display:none}
+    .lock-card{width:100%;max-width:360px;background:#0D2B32;border:1px solid #24545E;border-radius:24px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.28);text-align:center;color:#F2FBF8}
+    .lock-logo{width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,#2BB7A9,#7EDDD1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px}
+    .lock-card h1{font-size:24px;letter-spacing:-.04em;margin-bottom:6px}
+    .lock-card p{font-size:13px;color:#A8CCC5;margin-bottom:16px}
+    .lock-error{font-size:12px;color:#FF9F9F;margin-top:10px;min-height:18px}
+    .password-wrap{position:relative}
+    .password-wrap .input{padding-right:68px}
+    .show-pass-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:#143B43;color:#A8CCC5;border-radius:9px;padding:6px 9px;font-size:12px;font-weight:700;cursor:pointer}
+    .show-pass-btn:hover{color:#F2FBF8;background:#24545E}
+    #app-shell.locked{filter:blur(10px);pointer-events:none;user-select:none}
+    @media(max-width:900px){body{padding:8px}.app{height:auto;min-height:100vh;display:block}.sidebar{width:auto;flex-direction:row;overflow:auto;border-right:none;border-bottom:1px solid var(--line)}.logo,.sidebar-foot{display:none}.nav-btn{white-space:nowrap}.grid4,.grid3,.grid2{grid-template-columns:1fr}.week{grid-template-columns:1fr}.page{padding:16px}}
+  </style>
+</head>
+<body>
+  <div class="lock-screen" id="lock-screen">
+    <div class="lock-card">
+      <div class="lock-logo">🕺</div>
+      <h1>Organise Nathan</h1>
+      <p>Enter password to continue</p>
+      <div class="password-wrap">
+        <input class="input" id="password-input" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()">
+        <button class="show-pass-btn" type="button" onclick="togglePasswordPreview()" id="show-pass-btn">Show</button>
+      </div>
+      <button class="btn btn-primary" onclick="checkPassword()" style="width:100%;margin-top:10px">Unlock</button>
+      <button class="btn" onclick="unlockWithPasskey()" style="width:100%;margin-top:8px">🔐 Unlock with fingerprint / passkey</button>
+      <button class="btn btn-ghost" onclick="setupPasskey()" style="width:100%;margin-top:8px;color:#A8CCC5">Set up fingerprint access</button>
+      <div class="lock-error" id="lock-error"></div>
+    </div>
+  </div>
+  <div class="app" id="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><div class="logo-icon"><span class="logo-emoji">🕺</span></div><div class="logo-title">Organise</div><div class="logo-sub">Nathan</div></div>
+      <button class="nav-btn active" onclick="showPage('overview',this)"><span class="nav-icon">◈</span>Overview<span class="dot"></span></button>
+      <button class="nav-btn" onclick="showPage('dashboard',this)"><span class="nav-icon">◉</span>Dashboard</button>
+      <button class="nav-btn" onclick="showPage('content',this)"><span class="nav-icon">◫</span>Content</button>
+      <button class="nav-btn" onclick="showPage('tasks',this)"><span class="nav-icon">◻</span>Tasks</button>
+      <button class="nav-btn" onclick="showPage('report',this)"><span class="nav-icon">◧</span>Report</button>
+      <button class="nav-btn" onclick="showPage('settings',this)"><span class="nav-icon">◎</span>Settings</button>
+      <div class="sidebar-foot">6 companies · 3 platforms<br>data saved locally</div>
+    </aside>
+    <main class="main">
+      <section class="page active" id="page-overview">
+        <div class="top"><div><div class="title">Overview</div><div class="sub" id="today"></div></div><div style="display:flex;gap:8px"><button class="btn" id="mode-btn" onclick="toggleDarkMode()">🌙 Dark</button><button class="btn" id="undo-btn" onclick="undoLast()" disabled>↶ Undo</button><button class="btn btn-primary" onclick="openModal('task-modal')">+ Add task</button></div></div>
+        <div class="grid4">
+          <div class="stat"><div class="stat-label">tasks done</div><div class="stat-val" id="stat-done">0/0</div><div class="stat-sub" id="stat-pct">0% complete</div></div>
+          <div class="stat"><div class="stat-label">posts scheduled</div><div class="stat-val" id="stat-posts">0</div><div class="stat-sub">this week</div></div>
+          <div class="stat"><div class="stat-label">high priority</div><div class="stat-val" id="stat-high">0</div><div class="stat-sub">needs attention</div></div>
+          <div class="stat"><div class="stat-label">report notes</div><div class="stat-val" id="stat-notes">0</div><div class="stat-sub">this week</div></div>
+        </div>
+        <div class="focus-grid">
+          <div class="card focus-card today"><div class="section-label">due today</div><div id="today-list"></div></div>
+          <div class="card focus-card overdue"><div class="section-label">overdue</div><div id="overdue-list"></div></div>
+        </div>
+        <div class="card" style="margin-bottom:14px"><div class="section-label">progress by company</div><div id="company-bars"></div></div>
+        <div class="grid2"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="section-label" style="margin:0">priority tasks</div><button class="btn btn-ghost" onclick="openModal('task-modal')">+ add task</button></div><div id="priority-tasks"></div></div><div class="card"><div class="section-label">weekly progress</div><div class="stat-val" id="big-pct">0%</div><div class="progress" style="margin:10px 0"><div class="bar" id="big-bar" style="width:0%"></div></div><div class="stat-sub" id="big-label">0 of 0 done</div></div></div>
+      </section>
+      <section class="page" id="page-dashboard"><div class="top"><div><div class="title">Dashboard</div><div class="sub">Visual progress across all companies</div></div><div style="display:flex;gap:10px;align-items:center"><select class="select" id="dashboard-filter" onchange="renderDashboard()" style="width:auto"><option value="all">All brands</option></select><div class="sub" id="updated"></div></div></div><div class="grid4" id="dash-stats"></div><div class="grid3" id="dash-cards"></div><div class="card"><div class="section-label">full activity table</div><table class="table" id="dash-table"></table></div></section>
+      <section class="page" id="page-content"><div class="top"><div><div class="title">Content calendar</div><div class="sub" id="content-sub">0 posts</div></div><div style="display:flex;gap:8px;align-items:center"><select class="select" id="content-filter" onchange="renderContent()" style="width:auto"><option value="all">All brands</option></select><select class="select" id="calendar-view" onchange="renderContent()" style="width:auto"><option value="week">Week view</option><option value="month">Month view</option></select><button class="btn btn-primary" onclick="openModal('post-modal')">+ Schedule post</button></div></div><div class="card" style="margin-bottom:14px"><div class="section-label">this week</div><div class="week" id="week"></div></div><div class="card"><div class="section-label">post queue</div><div id="post-queue"></div></div></section>
+      <section class="page" id="page-tasks"><div class="top"><div><div class="title">Tasks</div><div class="sub" id="tasks-sub">0 pending</div></div><div style="display:flex;gap:10px;align-items:center"><select class="select" id="task-filter" onchange="renderTasks()" style="width:auto"><option value="all">All brands</option></select><button class="btn btn-primary" onclick="openModal('task-modal')">+ Add task</button></div></div><div class="card"><div class="section-label">task table</div><table class="table" id="tasks-table"></table></div></section>
+      <section class="page" id="page-report"><div class="top"><div><div class="title">Weekly report</div><div class="sub">Copy this into an email or Slack update</div></div><div style="display:flex;gap:8px;align-items:center"><select class="select" id="report-filter" onchange="renderReport()" style="width:auto"><option value="all">All brands</option></select><button class="btn" onclick="downloadReport()">Download .txt</button><button class="btn" onclick="window.print()">Print / PDF</button><button class="btn" onclick="copyReport()" id="copy-btn">Copy report</button><button class="btn btn-primary" onclick="openModal('note-modal')">+ Add note</button></div></div><div class="grid2"><div class="card"><div class="section-label">report preview</div><div class="report" id="report-text"></div></div><div class="card"><div class="section-label">notes</div><div id="notes-list"></div></div></div></section>
+      <section class="page" id="page-settings"><div class="top"><div><div class="title">Settings</div><div class="sub">Customise company names and colours</div></div><button class="btn" onclick="clearAll()">Clear data</button></div><div class="grid2"><div class="card"><div class="section-label">company names & colours</div><div id="settings-list"></div><button class="btn btn-primary" onclick="saveSettings()" style="margin-top:14px">Save changes</button></div><div class="card"><div class="section-label">best next upgrades</div><div class="task-row"><div>1</div><div><div class="task-title">Add due dates to tasks</div><div class="stat-sub">Best first feature before GitHub</div></div></div><div class="task-row"><div>2</div><div><div class="task-title">Add edit buttons for tasks and posts</div><div class="stat-sub">Currently delete/recreate only</div></div></div><div class="task-row"><div>3</div><div><div class="task-title">Export report as PDF</div><div class="stat-sub">Useful for boss updates</div></div></div></div></div></section>
+    </main>
+  </div>
+
+  <div class="modal-wrap" id="task-modal" onclick="closeOut(event,'task-modal')"><div class="modal"><h3 id="task-modal-title">Add task</h3><div class="form-row"><label class="label">description</label><input class="input" id="t-text" placeholder="e.g. Finish Flynt trade show video"></div><div class="form-row"><label class="label">company</label><select class="select" id="t-co"></select></div><div class="form-row"><label class="label">due date</label><input class="input" id="t-due" type="date"></div><div class="form-row"><label class="label">priority</label><select class="select" id="t-prio"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div><div class="form-row"><label class="label">type</label><select class="select" id="t-type"><option>Social Media</option><option>Website</option><option>Video</option><option>Strategy</option><option>Content</option><option>Reporting</option><option>Other</option></select></div><div class="btn-row"><button class="btn" onclick="closeModal('task-modal')">Cancel</button><button class="btn btn-primary" id="task-submit-btn" onclick="submitTask()">Add task</button></div></div></div>
+  <div class="modal-wrap" id="post-modal" onclick="closeOut(event,'post-modal')"><div class="modal"><h3 id="post-modal-title">Schedule post</h3><div class="form-row"><label class="label">company</label><select class="select" id="p-co"></select></div><div class="form-row"><label class="label">platform</label><select class="select" id="p-platform"><option value="Instagram">Instagram</option><option value="LinkedIn">LinkedIn</option><option value="Facebook">Facebook</option></select></div><div class="form-row"><label class="label">date</label><input class="input" id="p-date" type="date" onchange="syncPostDayFromDate()"></div><div class="form-row"><label class="label">day</label><select class="select" id="p-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div><div class="form-row"><label class="label">caption / topic</label><textarea class="textarea" id="p-caption" placeholder="Describe the post..."></textarea></div><div class="btn-row"><button class="btn" onclick="closeModal('post-modal')">Cancel</button><button class="btn btn-primary" id="post-submit-btn" onclick="submitPost()">Schedule</button></div></div></div>
+  <div class="modal-wrap" id="note-modal" onclick="closeOut(event,'note-modal')"><div class="modal"><h3>Add report note</h3><div class="form-row"><label class="label">company</label><select class="select" id="n-co"></select></div><div class="form-row"><label class="label">category</label><select class="select" id="n-cat"><option>Update</option><option>Achievement</option><option>Issue / Blocker</option><option>Upcoming</option><option>Strategy</option></select></div><div class="form-row"><label class="label">note</label><textarea class="textarea" id="n-text" placeholder="e.g. Finished Tiger Jaws video and sent to Lukas"></textarea></div><div class="btn-row"><button class="btn" onclick="closeModal('note-modal')">Cancel</button><button class="btn btn-primary" onclick="submitNote()">Add note</button></div></div></div>
+
+  <script>
+    const companiesDefault=[
+      {name:'Dropbear',color:'#378ADD'},{name:'Tiger Jaws',color:'#1D9E75'},{name:'Flynt',color:'#D85A30'},
+      {name:'JetPro',color:'#D4537E'},{name:'Sorensen Engineering',color:'#7F77DD'},{name:'Sorensen Product Lab',color:'#BA7517'}
+    ];
+    const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const types=['Social Media','Website','Video','Strategy','Content','Reporting','Other'];
+    function load(k,d){try{return JSON.parse(localStorage.getItem('mcc-preview:'+k))||d}catch{return d}}
+    function save(k,v){localStorage.setItem('mcc-preview:'+k,JSON.stringify(v))}
+    let companies=load('companies',companiesDefault),tasks=load('tasks',[]),posts=load('posts',[]),notes=load('notes',[]);
+    const APP_PASSWORD='Ho3042%na';
+    const PASSKEY_STORAGE_KEY='organise-nathan-passkey';
+    function bufferToBase64Url(buffer){
+      return btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    }
+    function base64UrlToBuffer(base64url){
+      const base64=base64url.replace(/-/g,'+').replace(/_/g,'/');
+      const padded=base64.padEnd(base64.length+(4-base64.length%4)%4,'=');
+      const binary=atob(padded);
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+      return bytes.buffer;
+    }
+    function randomChallenge(){
+      const challenge=new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+      return challenge;
+    }
+    async function setupPasskey(){
+      const error=document.getElementById('lock-error');
+      if(!window.PublicKeyCredential){error.textContent='Passkeys are not supported in this browser.';return;}
+      if(!window.isSecureContext){error.textContent='Passkeys need HTTPS or localhost. Use password here, then try after deployment.';return;}
+      try{
+        const credential=await navigator.credentials.create({
+          publicKey:{
+            challenge:randomChallenge(),
+            rp:{name:'Organise Nathan'},
+            user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'Nathan',displayName:'Nathan'},
+            pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+            authenticatorSelection:{userVerification:'required'},
+            timeout:60000,
+            attestation:'none'
+          }
+        });
+        localStorage.setItem(PASSKEY_STORAGE_KEY,JSON.stringify({id:credential.id,rawId:bufferToBase64Url(credential.rawId)}));
+        error.style.color='#72E38D';
+        error.textContent='Fingerprint / passkey access is set up.';
+      }catch(err){
+        error.style.color='#FF9F9F';
+        error.textContent='Passkey setup was cancelled or failed.';
+      }
+    }
+    async function unlockWithPasskey(){
+      const error=document.getElementById('lock-error');
+      const saved=localStorage.getItem(PASSKEY_STORAGE_KEY);
+      if(!saved){error.textContent='Set up fingerprint access first.';return;}
+      if(!window.PublicKeyCredential){error.textContent='Passkeys are not supported in this browser.';return;}
+      if(!window.isSecureContext){error.textContent='Passkeys need HTTPS or localhost. Use password here, then try after deployment.';return;}
+      try{
+        const passkey=JSON.parse(saved);
+        await navigator.credentials.get({
+          publicKey:{
+            challenge:randomChallenge(),
+            allowCredentials:[{type:'public-key',id:base64UrlToBuffer(passkey.rawId)}],
+            userVerification:'required',
+            timeout:60000
+          }
+        });
+        sessionStorage.setItem('organise-nathan-unlocked','true');
+        unlockApp();
+      }catch(err){
+        error.textContent='Fingerprint / passkey unlock failed.';
+      }
+    }
+    function togglePasswordPreview(){
+      const input=document.getElementById('password-input');
+      const btn=document.getElementById('show-pass-btn');
+      const showing=input.type==='text';
+      input.type=showing?'password':'text';
+      btn.textContent=showing?'Show':'Hide';
+      input.focus();
+    }
+    function checkPassword(){
+      const input=document.getElementById('password-input');
+      const error=document.getElementById('lock-error');
+      if(input.value===APP_PASSWORD){
+        sessionStorage.setItem('organise-nathan-unlocked','true');
+        unlockApp();
+      }else{
+        error.textContent='Incorrect password';
+        input.value='';
+        input.focus();
+      }
+    }
+    function unlockApp(){
+      document.getElementById('lock-screen').classList.add('unlocked');
+      document.getElementById('app-shell').classList.remove('locked');
+    }
+    function initLock(){
+      const app=document.getElementById('app-shell');
+      app.classList.add('locked');
+      if(sessionStorage.getItem('organise-nathan-unlocked')==='true')unlockApp();
+      else setTimeout(()=>document.getElementById('password-input')?.focus(),100);
+    }
+    let darkMode=load('darkMode',true);
+    // ensure dark mode applies immediately (before unlock)
+    if(darkMode){document.body.classList.add('dark-mode');}
+    function applyTheme(){document.body.classList.toggle('dark-mode',darkMode);const b=document.getElementById('mode-btn');if(b)b.textContent=darkMode?'☀️ Light':'🌙 Dark';}
+    function toggleDarkMode(){darkMode=!darkMode;save('darkMode',darkMode);applyTheme();}
+    let undoStack=[];
+    let editingTaskId=null;
+    let editingPostId=null;
+    function snapshot(){undoStack.push(JSON.stringify({companies,tasks,posts,notes}));if(undoStack.length>25)undoStack.shift();updateUndoButton();}
+    function undoLast(){const last=undoStack.pop();if(!last)return;const s=JSON.parse(last);companies=s.companies;tasks=s.tasks;posts=s.posts;notes=s.notes;persist();renderAll();updateUndoButton();applyTheme();initLock();applyTheme();initLock();}
+    function updateUndoButton(){const b=document.getElementById('undo-btn');if(b){b.disabled=!undoStack.length;b.style.opacity=undoStack.length?'1':'0.45';}}
+    if(tasks.length===0&&posts.length===0&&notes.length===0){
+      tasks=[
+        {id:1,text:'Finalise Flynt trade show video',co:2,prio:'high',type:'Video',due:todayPlus(0),done:false},
+        {id:2,text:'Film Tiger Jaws + Dropbear social content',co:1,prio:'medium',type:'Social Media',due:todayPlus(1),done:false},
+        {id:3,text:'Tiger Jaws website final polish',co:1,prio:'low',type:'Website',due:todayPlus(-1),done:true}
+      ];
+      posts=[{id:1,co:1,platform:'LinkedIn',day:'Thursday',caption:'AMW trade show update tile'}];
+      notes=[{id:1,co:1,cat:'Achievement',text:'Tiger Jaws video completed and sent to Lukas.',ts:Date.now()}];
+      persist();
+    }
+    function persist(){save('companies',companies);save('tasks',tasks);save('posts',posts);save('notes',notes)}
+    function todayPlus(days){const d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+    function formatDue(dateStr){if(!dateStr)return '';const d=new Date(dateStr+'T00:00:00');return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
+    function dueClass(dateStr,done){if(!dateStr||done)return 'due';const today=new Date();today.setHours(0,0,0,0);const d=new Date(dateStr+'T00:00:00');if(d<today)return 'overdue';if(d.getTime()===today.getTime())return 'today';return 'due';}
+    function sortedTasks(list){const prioRank={high:0,medium:1,low:2};return [...list].sort((a,b)=>{if(a.done!==b.done)return a.done?1:-1;const ad=a.due||'9999-12-31',bd=b.due||'9999-12-31';if(ad!==bd)return ad.localeCompare(bd);return (prioRank[a.prio]??3)-(prioRank[b.prio]??3);});}
+    function co(i){return companies[i]||companiesDefault[i]}
+    function shortName(n){return n.split(' ').map(w=>w[0]).join('').slice(0,4)}
+    function pill(text,cls){
+      const typeColors={
+        'Social Media':'background:#E0F7FA;color:#006064;border:1px solid #4DD0E1',
+        'Video':'background:#FCE4EC;color:#880E4F;border:1px solid #F06292',
+        'Website':'background:#E8F5E9;color:#1B5E20;border:1px solid #66BB6A',
+        'Strategy':'background:#FFF3E0;color:#E65100;border:1px solid #FFB74D',
+        'Content':'background:#EDE7F6;color:#311B92;border:1px solid #9575CD',
+        'Reporting':'background:#ECEFF1;color:#263238;border:1px solid #90A4AE',
+        'Other':'background:#F5F5F5;color:#424242;border:1px solid #BDBDBD'
+      };
+      if(typeColors[text]){
+        return `<span class="pill" style="${typeColors[text]}">${text}</span>`
+      }
+      return `<span class="pill ${cls||''}">${text}</span>`
+    }
+    function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.remove('active');const d=b.querySelector('.dot');if(d)d.remove()});btn.classList.add('active');const dot=document.createElement('span');dot.className='dot';btn.appendChild(dot);renderAll()}
+    function renderAll(){renderOverview();renderDashboard();renderTasks();renderContent();renderReport();renderSettings();populateSelects()}
+    function populateSelects(){
+      ['t-co','p-co','n-co'].forEach(id=>{
+        const el=document.getElementById(id);if(!el)return;
+        const current=el.value;
+        el.innerHTML=companies.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('')+(id==='n-co'?'<option value="general">General</option>':'');
+        if(current)el.value=current;
+      });
+
+      ['dashboard-filter','content-filter','task-filter','report-filter'].forEach(id=>{
+        const el=document.getElementById(id);if(!el)return;
+        const current=el.value||'all';
+        el.innerHTML='<option value="all">All brands</option>'+companies.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('');
+        el.value=current;
+      });
+    }
+    function renderOverview(){
+      const todayTasks=sortedTasks(tasks.filter(t=>!t.done && t.due===todayPlus(0)));
+      const overdueTasks=sortedTasks(tasks.filter(t=>!t.done && t.due && new Date(t.due+'T00:00:00')<new Date(todayPlus(0)+'T00:00:00')));
+      const todayEl=document.getElementById('today-list');
+      const overdueEl=document.getElementById('overdue-list');
+      if(todayEl)todayEl.innerHTML=todayTasks.length?todayTasks.map(taskRow).join(''):'<div class="empty" style="padding:20px 10px">Nothing due today</div>';
+      if(overdueEl)overdueEl.innerHTML=overdueTasks.length?overdueTasks.map(taskRow).join(''):'<div class="empty" style="padding:20px 10px">No overdue tasks</div>';
+      document.getElementById('today').textContent=new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      const done=tasks.filter(t=>t.done).length,total=tasks.length,pct=total?Math.round(done/total*100):0;
+      stat('stat-done',done+'/'+total);stat('stat-pct',pct+'% complete');stat('stat-posts',posts.length);stat('stat-high',tasks.filter(t=>!t.done&&t.prio==='high').length);stat('stat-notes',notes.length);stat('big-pct',pct+'%');stat('big-label',done+' of '+total+' done');document.getElementById('big-bar').style.width=pct+'%';
+      document.getElementById('company-bars').innerHTML=companies.map((c,i)=>{const ct=tasks.filter(t=>t.co==i).length,cd=tasks.filter(t=>t.co==i&&t.done).length,p=ct?Math.round(cd/ct*100):0;return `<div class="company-row"><div class="co-name" style="color:${c.color}"><span class="co-dot" style="background:${c.color}"></span>${c.name}</div><div class="progress"><div class="bar" style="width:${p}%;background:${c.color}"></div></div><div style="font-size:13px;font-weight:750">${p}%</div><div class="stat-sub">${cd}/${ct}</div></div>`}).join('');
+      const pri=sortedTasks(tasks.filter(t=>!t.done)).slice(0,5);document.getElementById('priority-tasks').innerHTML=pri.length?pri.map(taskRow).join(''):'<div class="empty">No pending tasks — enjoy it.</div>';
+    }
+    function stat(id,val){const el=document.getElementById(id);if(el)el.textContent=val}
+    function renderDashboard(){document.getElementById('updated').textContent='Updated '+new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});const selectedBrand=document.getElementById('dashboard-filter')?.value||'all';const dashTasks=selectedBrand==='all'?tasks:tasks.filter(t=>String(t.co)===selectedBrand);const dashPosts=selectedBrand==='all'?posts:posts.filter(p=>String(p.co)===selectedBrand);const done=dashTasks.filter(t=>t.done).length,total=dashTasks.length,pct=total?Math.round(done/total*100):0;document.getElementById('dash-stats').innerHTML=[['overall completion',pct+'%',done+' of '+total+' tasks'],['due today',dashTasks.filter(t=>!t.done&&t.due===todayPlus(0)).length,'focus list'],['overdue',dashTasks.filter(t=>!t.done&&t.due&&new Date(t.due+'T00:00:00')<new Date(todayPlus(0)+'T00:00:00')).length,'needs action'],['high priority open',dashTasks.filter(t=>!t.done&&t.prio==='high').length,'needs attention']].map(s=>`<div class="stat"><div class="stat-label">${s[0]}</div><div class="stat-val">${s[1]}</div><div class="stat-sub">${s[2]}</div></div>`).join('');document.getElementById('dash-cards').innerHTML=companies.filter((c,i)=>selectedBrand==='all'||String(i)===selectedBrand).map((c)=>{const i=companies.indexOf(c);const ct=tasks.filter(t=>t.co==i).length,cd=tasks.filter(t=>t.co==i&&t.done).length,p=ct?Math.round(cd/ct*100):0;return `<div class="card"><div class="co-name" style="color:${c.color}"><span class="co-dot" style="background:${c.color}"></span>${c.name}</div><div class="stat-val" style="color:${c.color};margin:12px 0 4px">${p}%</div><div class="progress"><div class="bar" style="width:${p}%;background:${c.color}"></div></div><div class="stat-sub" style="margin-top:8px">${cd} done · ${ct-cd} left · ${posts.filter(p=>p.co==i).length} posts</div></div>`}).join('');document.getElementById('dash-table').innerHTML='<tr><th>Company</th><th>Task</th><th>Due</th><th>Type</th><th>Priority</th><th>Status</th></tr>'+sortedTasks(dashTasks).map(t=>`<tr><td style="color:${co(t.co).color};font-weight:700">${co(t.co).name}</td><td>${t.text}</td><td>${t.due?pill(formatDue(t.due),dueClass(t.due,t.done)):'—'}</td><td>${t.type}</td><td>${pill(t.prio,t.prio)}</td><td>${t.done?pill('Done','done'):pill('In progress','progress')}</td></tr>`).join('')}
+    function taskRow(t){return `<div class="task-row"><div class="check ${t.done?'done':''}" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div><div style="flex:1"><div class="task-title ${t.done?'done':''}">${t.text}</div><div class="meta"><span class="pill" style="background:${co(t.co).color}20;color:${co(t.co).color};border-color:${co(t.co).color}33">${co(t.co).name}</span>${pill(t.type,'progress')}${pill(t.prio,t.prio)}${t.due?pill('Due '+formatDue(t.due),dueClass(t.due,t.done)):''}</div></div><div class="task-actions"><button class="icon-btn" onclick="editTask(${t.id})">✎</button><button class="delete" onclick="deleteTask(${t.id})">×</button></div></div>`}
+    function renderTasks(){
+      const selectedBrand=document.getElementById('task-filter')?.value||'all';
+      const visibleTasks=selectedBrand==='all'?tasks:tasks.filter(t=>String(t.co)===selectedBrand);
+      const pending=sortedTasks(visibleTasks.filter(t=>!t.done));
+      const done=sortedTasks(visibleTasks.filter(t=>t.done));
+      const all=sortedTasks(visibleTasks);
+      stat('tasks-sub',pending.length+' pending · '+done.length+' completed');
+
+      const table=document.getElementById('tasks-table');
+      if(!table)return;
+
+      table.innerHTML='<tr><th>Company</th><th>Task</th><th>Due</th><th>Type</th><th>Priority</th><th>Status</th><th></th></tr>'+(
+        all.length?all.map(t=>`<tr>
+          <td style="color:${co(t.co).color};font-weight:700">${co(t.co).name}</td>
+          <td style="${t.done?'text-decoration:line-through;color:var(--faint)':''}">${t.text}</td>
+          <td>${t.due?pill(formatDue(t.due),dueClass(t.due,t.done)):'—'}</td>
+          <td>${pill(t.type)}</td>
+          <td>${pill(t.prio,t.prio)}</td>
+          <td>${t.done?pill('Done','done'):pill('In progress','progress')}</td>
+          <td style="text-align:right;white-space:nowrap"><button class="icon-btn" onclick="editTask(${t.id})">✎</button><button class="delete" onclick="deleteTask(${t.id})">×</button></td>
+        </tr>`).join(''):'<tr><td colspan="7"><div class="empty">No tasks yet</div></td></tr>'
+      );
+    }
+    function renderContent(){
+      const selectedBrand=document.getElementById('content-filter')?.value||'all';
+      const visiblePosts=selectedBrand==='all'?posts:posts.filter(p=>String(p.co)===selectedBrand);
+      const view=document.getElementById('calendar-view')?.value||'week';
+      stat('content-sub',visiblePosts.length+' posts');
+      const cal=document.getElementById('week');
+
+      if(view==='week'){
+        cal.className='week';
+        cal.innerHTML=days.map(day=>{
+          const ps=visiblePosts.filter(p=>p.day===day);
+          return `<div class="day"><div class="day-head">${day.slice(0,3)}</div>${ps.length?ps.map(p=>`<div class="post" onclick="editPost(${p.id})" style="background:${co(p.co).color}20;color:${co(p.co).color};border:1px solid ${co(p.co).color}33;cursor:pointer"><strong>${p.platform}</strong> · ${shortName(co(p.co).name)}<br>${p.caption||''}</div>`).join(''):'<button class="btn" style="width:100%;padding:18px 0;color:var(--faint)" onclick="openModal(\'post-modal\')">+</button>'}</div>`
+        }).join('');
+      }else{
+        cal.className='month-grid';
+        const now=new Date();
+        const year=now.getFullYear(),month=now.getMonth();
+        const first=new Date(year,month,1);
+        const startOffset=(first.getDay()+6)%7;
+        const daysInMonth=new Date(year,month+1,0).getDate();
+        let html=days.map(d=>`<div class="day-head">${d.slice(0,3)}</div>`).join('');
+        for(let i=0;i<startOffset;i++)html+=`<div class="month-cell muted"></div>`;
+        for(let d=1;d<=daysInMonth;d++){
+          const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          const ps=visiblePosts.filter(p=>p.date===dateStr);
+          html+=`<div class="month-cell"><div class="month-date">${d}</div>${ps.map(p=>`<div class="post" onclick="editPost(${p.id})" style="background:${co(p.co).color}20;color:${co(p.co).color};border:1px solid ${co(p.co).color}33;cursor:pointer"><strong>${p.platform}</strong><br>${p.caption||''}</div>`).join('')}</div>`;
+        }
+        cal.innerHTML=html;
+      }
+
+      document.getElementById('post-queue').innerHTML=visiblePosts.length?visiblePosts.map(p=>`<div class="task-row"><div style="width:4px;border-radius:99px;background:${co(p.co).color}"></div><div style="flex:1"><div class="task-title"><strong>${co(p.co).name}</strong> · ${p.platform} · ${p.date?formatDue(p.date):p.day}</div><div class="stat-sub">${p.caption||'No caption yet'}</div></div><div class="task-actions"><button class="icon-btn" onclick="editPost(${p.id})">✎</button><button class="delete" onclick="deletePost(${p.id})">×</button></div></div>`).join(''):'<div class="empty">No posts scheduled yet</div>'
+    }
+    function renderReport(){const selectedBrand=document.getElementById('report-filter')?.value||'all';const reportTasks=selectedBrand==='all'?tasks:tasks.filter(t=>String(t.co)===selectedBrand);const reportPosts=selectedBrand==='all'?posts:posts.filter(p=>String(p.co)===selectedBrand);const reportCompanies=companies.filter((c,i)=>selectedBrand==='all'||String(i)===selectedBrand);const done=reportTasks.filter(t=>t.done),pending=reportTasks.filter(t=>!t.done);let r=`WEEKLY MARKETING UPDATE — ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}\n════════════════════════════════════════════\n\nSUMMARY\nTasks completed: ${done.length}   Pending: ${pending.length}   Posts: ${posts.length}\n`;reportCompanies.forEach((c)=>{const i=companies.indexOf(c);const companyNotes=notes.filter(n=>n.co==i),companyDone=done.filter(t=>t.co==i),companyPosts=reportPosts.filter(p=>p.co==i);if(companyNotes.length||companyDone.length||companyPosts.length){r+=`\n\n${c.name.toUpperCase()}\n────────────────────────────────────────────`;companyNotes.forEach(n=>r+=`\n  [${n.cat}] ${n.text}`);companyDone.forEach(t=>r+=`\n  ✓ ${t.text} (${t.type})`);companyPosts.forEach(p=>r+=`\n  📅 ${p.day}: ${p.platform} — ${(p.caption||'').slice(0,60)}`)}});if(pending.length){r+=`\n\nIN PROGRESS\n────────────────────────────────────────────`;sortedTasks(pending).forEach(t=>r+=`
+  • ${t.text} — ${co(t.co).name} (${t.type})${t.due?' · due '+formatDue(t.due):''}`)}r+=`\n\nGenerated by Organise Nathan`;document.getElementById('report-text').textContent=r;document.getElementById('notes-list').innerHTML=notes.length?notes.map(n=>`<div class="task-row"><div style="flex:1"><div class="task-title"><strong>${n.co==='general'?'General':co(n.co).name}</strong> · ${n.cat}</div><div class="stat-sub">${n.text}</div></div><button class="delete" onclick="deleteNote(${n.id})">×</button></div>`).join(''):'<div class="empty">Add notes to build your report</div>'}
+    function renderSettings(){document.getElementById('settings-list').innerHTML=companies.map((c,i)=>`<div class="colour-row"><div class="swatch" id="swatch-${i}" style="background:${c.color}"><input type="color" value="${c.color}" id="color-${i}" oninput="previewCompanyColour(${i},this.value)" onchange="previewCompanyColour(${i},this.value)"></div><input class="input" id="name-${i}" value="${c.name}"></div>`).join('')}
+    function previewCompanyColour(i,value){
+      if(!window.__colourChanging){snapshot();window.__colourChanging=true;setTimeout(()=>window.__colourChanging=false,600);}
+      companies[i].color=value;
+      const swatch=document.getElementById('swatch-'+i);
+      if(swatch)swatch.style.background=value;
+      renderOverview();renderDashboard();renderTasks();renderContent();renderReport();
+    }
+    function openModal(id){
+      populateSelects();
+      if(id==='task-modal'&&!editingTaskId){
+        document.getElementById('task-modal-title').textContent='Add task';
+        document.getElementById('task-submit-btn').textContent='Add task';
+        document.getElementById('t-text').value='';
+        document.getElementById('t-due').value=todayPlus(0);
+        document.getElementById('t-prio').value='medium';
+        document.getElementById('t-type').value='Social Media';
+      }
+      if(id==='post-modal'&&!editingPostId){
+        document.getElementById('post-modal-title').textContent='Schedule post';
+        document.getElementById('post-submit-btn').textContent='Schedule';
+        document.getElementById('p-caption').value='';
+        document.getElementById('p-date').value=todayPlus(0);
+        syncPostDayFromDate();
+      }
+      document.getElementById(id).classList.add('open')
+    }
+    function closeModal(id){
+      document.getElementById(id).classList.remove('open');
+      if(id==='task-modal')editingTaskId=null;
+      if(id==='post-modal')editingPostId=null;
+    }
+    function closeOut(e,id){if(e.target.id===id)closeModal(id)}
+    function submitTask(){const text=document.getElementById('t-text').value.trim();if(!text)return;snapshot();const taskData={text,co:+document.getElementById('t-co').value,prio:document.getElementById('t-prio').value,type:document.getElementById('t-type').value,due:document.getElementById('t-due').value||''};if(editingTaskId){tasks=tasks.map(t=>t.id===editingTaskId?{...t,...taskData}:t);editingTaskId=null;}else{tasks.unshift({id:Date.now(),...taskData,done:false});}document.getElementById('t-text').value='';document.getElementById('t-due').value='';persist();closeModal('task-modal');renderAll()}
+    function editTask(id){const t=tasks.find(t=>t.id===id);if(!t)return;editingTaskId=id;populateSelects();document.getElementById('task-modal-title').textContent='Edit task';document.getElementById('task-submit-btn').textContent='Save task';document.getElementById('t-text').value=t.text;document.getElementById('t-co').value=t.co;document.getElementById('t-due').value=t.due||'';document.getElementById('t-prio').value=t.prio;document.getElementById('t-type').value=t.type;document.getElementById('task-modal').classList.add('open');}function toggleTask(id){snapshot();tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t);persist();renderAll()}function deleteTask(id){snapshot();tasks=tasks.filter(t=>t.id!==id);persist();renderAll()}
+    function syncPostDayFromDate(){const date=document.getElementById('p-date').value;if(!date)return;const d=new Date(date+'T00:00:00');document.getElementById('p-day').value=days[(d.getDay()+6)%7]}
+    function submitPost(){
+      const caption=document.getElementById('p-caption').value.trim();
+      snapshot();
+      const postData={
+        co:+document.getElementById('p-co').value,
+        platform:document.getElementById('p-platform').value,
+        day:document.getElementById('p-day').value,
+        date:document.getElementById('p-date').value||'',
+        caption
+      };
+      if(editingPostId){
+        posts=posts.map(p=>p.id===editingPostId?{...p,...postData}:p);
+        editingPostId=null;
+      }else{
+        posts.push({id:Date.now(),...postData});
+      }
+      document.getElementById('p-caption').value='';
+      document.getElementById('p-date').value='';
+      persist();
+      closeModal('post-modal');
+      renderAll()
+    }
+    function editPost(id){
+      const p=posts.find(p=>p.id===id);
+      if(!p)return;
+      editingPostId=id;
+      populateSelects();
+      document.getElementById('post-modal-title').textContent='Edit post';
+      document.getElementById('post-submit-btn').textContent='Save post';
+      document.getElementById('p-co').value=p.co;
+      document.getElementById('p-platform').value=p.platform;
+      document.getElementById('p-date').value=p.date||'';
+      document.getElementById('p-day').value=p.day||'Monday';
+      document.getElementById('p-caption').value=p.caption||'';
+      document.getElementById('post-modal').classList.add('open');
+    }
+    function deletePost(id){snapshot();posts=posts.filter(p=>p.id!==id);persist();renderAll()}
+    function submitNote(){const text=document.getElementById('n-text').value.trim();if(!text)return;snapshot();let coVal=document.getElementById('n-co').value;notes.unshift({id:Date.now(),co:coVal==='general'?'general':+coVal,cat:document.getElementById('n-cat').value,text,ts:Date.now()});document.getElementById('n-text').value='';persist();closeModal('note-modal');renderAll()}function deleteNote(id){snapshot();notes=notes.filter(n=>n.id!==id);persist();renderAll()}
+    function saveSettings(){snapshot();companies=companies.map((c,i)=>({name:document.getElementById('name-'+i).value.trim()||c.name,color:document.getElementById('color-'+i).value||c.color}));persist();renderAll()}
+function clearAll(){if(confirm('Clear all local preview data?')){snapshot();tasks=[];posts=[];notes=[];companies=companiesDefault;persist();renderAll()}}
+    function copyReport(){navigator.clipboard.writeText(document.getElementById('report-text').textContent);const b=document.getElementById('copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy report',1300)}
+    function downloadReport(){const text=document.getElementById('report-text').textContent;const blob=new Blob([text],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='organise-nathan-weekly-report.txt';a.click();URL.revokeObjectURL(url)}
+    renderAll();updateUndoButton();
+  </script>
+</body>
+</html>
